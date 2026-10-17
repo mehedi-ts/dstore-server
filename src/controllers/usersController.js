@@ -5,7 +5,7 @@ const getUsers = async (req, res, next) => {
     const users = await User.find();
     return res.status(200).send({
       success: true,
-      message: "all users are fetch successfully",
+      message: "all users are returnd successfully",
       users,
     });
   } catch (error) {
