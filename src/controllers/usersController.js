@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const { successResponseHandler } = require("../utils/responsehandler");
 
 const getUsers = async (req, res, next) => {
   try {
@@ -20,17 +21,32 @@ const getUsers = async (req, res, next) => {
       .skip((page - 1) * limit);
 
     const usersCoutn = await User.countDocuments(filter);
-    return res.status(200).send({
-      success: true,
-      message: "all users are returnd successfully",
-      totalUsers: usersCoutn,
-      pagination: {
-        totalPages: Math.ceil(usersCoutn / limit),
-        curentPage: page,
-        nextPage: page >= Math.ceil(usersCoutn / limit) ? null : page + 1,
-        previousPage: page === 1 ? null : page - 1,
+    // return res.status(200).send({
+    //   success: true,
+    //   message: "all users are returnd successfully",
+    //   totalUsers: usersCoutn,
+    //   pagination: {
+    //     totalPages: Math.ceil(usersCoutn / limit),
+    //     curentPage: page,
+    //     nextPage: page >= Math.ceil(usersCoutn / limit) ? null : page + 1,
+    //     previousPage: page === 1 ? null : page - 1,
+    //   },
+    //   users,
+    // });
+
+    return successResponseHandler(res, {
+      statusCode: 200,
+      message: "users are returnd successfully",
+      payload: {
+        totalUsers: usersCoutn,
+        pagination: {
+          totalPages: Math.ceil(usersCoutn / limit),
+          curentPage: page,
+          nextPage: page >= Math.ceil(usersCoutn / limit) ? null : page + 1,
+          previousPage: page === 1 ? null : page - 1,
+        },
+        users,
       },
-      users,
     });
   } catch (error) {
     next(error);
