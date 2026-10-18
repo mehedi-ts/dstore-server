@@ -3,7 +3,6 @@ const User = require("../models/userModel");
 const createHttpError = require("http-errors");
 
 const getUserById = async (id) => {
-  console.log(`user id ${id}`);
   if (!mongoose.isValidObjectId(id)) {
     throw createHttpError(400, "Invalid User ID");
   }

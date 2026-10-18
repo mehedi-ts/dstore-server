@@ -72,4 +72,25 @@ const getUser = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { getUsers, getUser };
+const deleteUser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    await getUserById(id);
+    const deletedUser = await User.findOneAndDelete({
+      _id: id,
+      isAdmin: false,
+    });
+
+    if (!deletedUser) {
+      throw createHttpError(403, "User not found or cannot be deleted");
+    }
+
+    return successResponseHandler(res, {
+      statusCode: 200,
+      message: "user deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = { getUsers, getUser, deleteUser };
