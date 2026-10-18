@@ -2,6 +2,7 @@ const createHttpError = require("http-errors");
 const User = require("../models/userModel");
 const { successResponseHandler } = require("../utils/responsehandler");
 const { default: mongoose } = require("mongoose");
+const getUserById = require("../services/getUserById");
 
 const getUsers = async (req, res, next) => {
   try {
@@ -58,14 +59,8 @@ const getUsers = async (req, res, next) => {
 const getUser = async (req, res, next) => {
   try {
     const id = req.params.id;
+    const user = await getUserById(id);
 
-    if (!mongoose.isValidObjectId(id)) {
-      throw createHttpError(400, "Invalid User ID");
-    }
-    const user = await User.findById(id);
-    if (!user) {
-      throw createHttpError(404, "User Not Found");
-    }
     return successResponseHandler(res, {
       statusCode: 200,
       message: "user returnd successfully",
