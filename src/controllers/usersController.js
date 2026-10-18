@@ -1,5 +1,7 @@
+const createHttpError = require("http-errors");
 const User = require("../models/userModel");
 const { successResponseHandler } = require("../utils/responsehandler");
+const { default: mongoose } = require("mongoose");
 
 const getUsers = async (req, res, next) => {
   try {
@@ -20,7 +22,7 @@ const getUsers = async (req, res, next) => {
       .limit(limit)
       .skip((page - 1) * limit);
 
-    const usersCoutn = await User.countDocuments(filter);
+    const usersCount = await User.countDocuments(filter);
     // return res.status(200).send({
     //   success: true,
     //   message: "all users are returnd successfully",
@@ -38,11 +40,11 @@ const getUsers = async (req, res, next) => {
       statusCode: 200,
       message: "users are returnd successfully",
       payload: {
-        totalUsers: usersCoutn,
+        totalUsers: usersCount,
         pagination: {
-          totalPages: Math.ceil(usersCoutn / limit),
-          curentPage: page,
-          nextPage: page >= Math.ceil(usersCoutn / limit) ? null : page + 1,
+          totalPages: Math.ceil(usersCount / limit),
+          currntPage: page,
+          nextPage: page >= Math.ceil(usersCount / limit) ? null : page + 1,
           previousPage: page === 1 ? null : page - 1,
         },
         users,
@@ -52,4 +54,27 @@ const getUsers = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { getUsers };
+
+const getUser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    if (!mongoose.isValidObjectId(id)) {
+      throw createHttpError(400, "Invalid User ID");
+    }
+    const user = await User.findById(id);
+    if (!user) {
+      throw createHttpError(404, "User Not Found");
+    }
+    return successResponseHandler(res, {
+      statusCode: 200,
+      message: "user returnd successfully",
+      payload: {
+        user,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = { getUsers, getUser };
