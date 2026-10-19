@@ -1,8 +1,7 @@
 const createHttpError = require("http-errors");
 const User = require("../models/userModel");
 const { successResponseHandler } = require("../utils/responsehandler");
-const { default: mongoose } = require("mongoose");
-const getUserById = require("../services/getUserById");
+const getItemById = require("../services/getItemById");
 
 const getUsers = async (req, res, next) => {
   try {
@@ -59,7 +58,7 @@ const getUsers = async (req, res, next) => {
 const getUser = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const user = await getUserById(id);
+    const user = await getItemById(id, User);
 
     return successResponseHandler(res, {
       statusCode: 200,
@@ -75,7 +74,7 @@ const getUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
   try {
     const id = req.params.id;
-    await getUserById(id);
+    await getItemById(id, User);
     const deletedUser = await User.findOneAndDelete({
       _id: id,
       isAdmin: false,
