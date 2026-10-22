@@ -3,6 +3,29 @@ const User = require("../models/userModel");
 const { successResponseHandler } = require("../utils/responsehandler");
 const getItemById = require("../services/getItemById");
 
+const registerUser = async (req, res, next) => {
+  try {
+    const { name, email } = req.body;
+    const userExists = await User.exists({ email: email });
+    if (userExists) {
+      throw createHttpError(
+        409,
+        "user with this email alrady exist. please login",
+      );
+    }
+    const user = { name, email };
+
+    return successResponseHandler(res, {
+      statusCode: 201,
+      message: "users registered successfully",
+      payload: {
+        user,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 const getUsers = async (req, res, next) => {
   try {
     const search = req.query.search || "";
@@ -92,4 +115,4 @@ const deleteUser = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { getUsers, getUser, deleteUser };
+module.exports = { getUsers, getUser, deleteUser, registerUser };
