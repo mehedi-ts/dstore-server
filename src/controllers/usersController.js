@@ -2,6 +2,8 @@ const createHttpError = require("http-errors");
 const User = require("../models/userModel");
 const { successResponseHandler } = require("../utils/responsehandler");
 const getItemById = require("../services/getItemById");
+const { createJSONWebToken } = require("../helper/jsonWebToken");
+const { jwtPrivateKey } = require("../secret");
 
 const registerUser = async (req, res, next) => {
   try {
@@ -13,6 +15,9 @@ const registerUser = async (req, res, next) => {
         "user with this email alrady exist. please login",
       );
     }
+    //create jwt
+    const token = createJSONWebToken({ name, email }, jwtPrivateKey, "10m");
+
     const user = { name, email };
 
     return successResponseHandler(res, {
@@ -20,6 +25,7 @@ const registerUser = async (req, res, next) => {
       message: "users registered successfully",
       payload: {
         user,
+        token,
       },
     });
   } catch (error) {
